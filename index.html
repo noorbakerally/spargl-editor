@@ -1,0 +1,200 @@
+<html>
+	<head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>SPARGL Query Editor</title>
+    
+    
+
+
+<style type="text/css">
+/*<![CDATA[*/
+html { padding: 0; }
+body {
+padding: 0;
+margin: 0;
+font-family:Gill Sans, Arial, Helvetica, sans-serif;
+font-size: 9pt;
+color: #333;
+background-color: #FDFDFD;
+}
+#header {
+padding: 0;
+margin: 0;
+background-color: #86B9D9;
+color: #FFFFFF;
+border-bottom: 1px solid #AAA;
+}
+#header h1 {
+font-size: 16pt;
+font-weight: normal;
+text-align: left;
+vertical-align: middle;
+padding: 4px 8px 4px 8px;
+margin: 0px 0px 0px 0px;
+}
+#menu {
+margin-left: 8px;
+margin-right: 8px;
+margin-top: 0px;
+clear: right;
+float: right;
+}
+#intro,#main {
+margin-left: 8px;
+margin-right: 8px;
+}
+#help {
+margin-left: 8px;
+margin-right: 8px;
+width: 80%
+}
+#footer {
+width: 100%;
+float: left;
+clear: left;
+margin: 2em 0 0;
+padding-top: 0.7ex;
+border-top: 1px solid #AAA;
+font-size: 8pt;
+text-align: center;
+}
+fieldset {
+border: 0;
+padding: 0;
+margin: 0;
+}
+fieldset label {
+font-weight: normal;
+white-space: nowrap;
+font-size: 11pt;
+color: #000;
+}
+fieldset label.n {
+display: block;
+vertical-align: bottom;
+margin-top:5px;
+width: 160px;
+float:left;
+white-space: nowrap;
+}
+fieldset label.n:after { content: ":"; }
+fieldset label.n1 {
+display: block;
+vertical-align: bottom;
+margin-top:5px;
+width: 160px;
+float:left;
+white-space: nowrap;
+}
+fieldset label.ckb {
+width: 160px;
+font-weight: normal;
+font-size: 10pt;
+}
+fieldset label.ckb:after { content: ""; }
+fieldset textarea,.bigtextarea {
+width: 99%;
+font-family: monospace;
+font-size: 10pt;
+}
+#cxml {
+clear: both;
+display: block;
+}
+#savefs {
+clear: both;
+display: block;
+}
+span.info {
+font-size: 9pt;
+white-space: nowrap;
+height: 2em;
+}
+br { clear: both; }
+/*]]>*/
+</style>
+
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+   <script src="script.js"></script>
+</head>
+<body>
+    <div id="header">
+	<h1> SPARGL Query Editor</h1>
+    </div>
+
+    <div id="menu">
+	  <a href="http://semantic.ckan.net/sparql?help=intro">About</a>
+	| <a href="http://semantic.ckan.net/sparql?nsdecl">Namespace Prefixes</a>
+    </div>
+
+    <div id="main">
+    <br>
+	<fieldset>
+		<label for="query">Query Text</label><br>
+		<textarea rows="18" cols="80" name="query" id="query">
+BASE <http://example.org/>
+PREFIX rqg-ite: <http://w3id.org/sparql-generate/ite/>
+PREFIX rqg-fn: <http://w3id.org/sparql-generate/fn/>
+PREFIX country:<http://loc.example.com/city/>
+PREFIX schema: <http://schema.org/>
+PREFIX wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+PREFIX gn: <http://www.geonames.org/ontology#>
+PREFIX transit: <http://vocab.org/transit/terms/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+GENERATE { 
+  ?busURI a transit:Stop .
+  GENERATE {
+    ?busURI transit:stop ?stopId .
+    ?busURI rdfs:label ?stopLabel .
+  }
+  ITERATOR rqg-ite:XPath(?bus, "//stop" ) AS ?stop 
+  WHERE {
+    BIND( STRDT(rqg-fn:XPath(?stop, "/stop/@id"),xsd:integer) AS ?stopId )
+    BIND( rqg-fn:XPath(?stop, "/stop") AS ?stopLabel )
+  } .
+}
+SOURCE <https://raw.githubusercontent.com/noorbakerally/sparql-generate-jena/master/src/test/resources/transport/transport.xml> AS ?source
+ITERATOR rqg-ite:XPath(?source, "//bus" ) AS ?bus
+WHERE {
+   BIND(rqg-fn:XPath( ?bus, "/bus/@id") AS ?id )
+   BIND (URI(CONCAT("http://trans.example.com/",?id)) AS ?busURI)
+} 
+
+		</textarea>
+		<label for="format" class="n">Results Format</label>
+		<select name="format" id="format">
+			<option value="TTL" selected="selected">Turtle</option>
+			<option value="RDFXML">RDF/XML</option>
+			<option value="N3">N3</option>
+			<option value="JSONLD">JSONLD</option>
+		</select>
+		
+		<br>
+		<button onClick="generate()">Run Query</button>
+		<button onClick="reset()">Reset</button>
+
+		<div id="results" style="display:none">
+			<br/><strong>Results</strong>
+		    <textarea id="result" rows="18" cols="80" class="bigtextarea" >
+
+		    </textarea>
+		</div>
+		<div id="loading" style="display:none">
+				<center>
+					<img src="images/loading.gif" style="width:200px"/>
+				</center>
+		</div>
+
+	</fieldset>
+    </div>
+
+
+    
+
+
+</div></div></div></div></div></div></div></div></div></div></div></div></div></body>
+<script>
+
+</script>
+</html>
